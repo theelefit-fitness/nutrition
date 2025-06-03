@@ -230,8 +230,8 @@
   flex-grow: 1;
 }
 
-/* CTA Section */
-.cta-section {
+/* Expert Section (Previously CTA Section) */
+.expert-section {
   background-color: var(--primary-color);
   color: white;
   padding: clamp(60px, 10vw, 100px) 20px;
@@ -240,7 +240,7 @@
   overflow: hidden;
 }
 
-.cta-section::before {
+.expert-section::before {
   content: '';
   position: absolute;
   width: 200px;
@@ -250,9 +250,11 @@
   border-radius: 50%;
   top: -100px;
   left: -100px;
+  z-index: 0;
+  animation: float 15s ease-in-out infinite;
 }
 
-.cta-section::after {
+.expert-section::after {
   content: '';
   position: absolute;
   width: 300px;
@@ -262,33 +264,36 @@
   border-radius: 50%;
   bottom: -150px;
   right: -150px;
+  z-index: 0;
+  animation: float 20s ease-in-out infinite alternate;
 }
 
-.cta-content {
+.expert-section-content {
   max-width: 800px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
   opacity: 0;
-  transform: translateY(30px);
-  animation: fadeInUp 1s forwards 0.3s;
+  transform: translateY(20px);
+  animation: fadeInUp 1s forwards 0.7s;
 }
 
-.cta-content h2 {
+.expert-section-content h2 {
   font-size: clamp(2rem, 4vw, 2.5rem);
-  margin-bottom: clamp(15px, 2vw, 20px);
-  color: white;
-  line-height: 1.3;
+  margin-bottom: 20px;
+  font-weight: 700;
 }
 
-.cta-content p {
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  margin-bottom: clamp(30px, 4vw, 40px);
-  font-weight: 400;
+.expert-section-content p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  margin-bottom: 30px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
   line-height: 1.6;
 }
 
-.register-button {
+.apply-button, .hide-form-button {
   display: inline-block;
   background-color: var(--secondary-color);
   color: var(--text-color);
@@ -297,16 +302,37 @@
   border-radius: 30px;
   font-weight: 600;
   font-size: clamp(1rem, 2vw, 1.1rem);
-  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(200, 218, 43, 0.3);
+  border: none;
+  cursor: pointer;
 }
 
-.register-button:hover {
-  background-color: white;
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+.apply-button:hover {
+  transition: 1s ease-out 0.5s;
+  background-color: #4E3580;
+ color: white;
+  box-shadow: 0 8px 25px rgba(200, 218, 43, 0.5);
+}
+
+
+.hide-form-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  margin-bottom: 30px;
+}
+
+.hide-form-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.application-form-wrapper {
+  max-width: 800px;
+  margin: 30px auto 0;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: fadeInUp 0.8s forwards;
 }
 
 /* Animations */
@@ -356,7 +382,7 @@
     padding: 25px 20px;
   }
   
-  .cta-section {
+  .expert-section {
     padding: 50px 15px;
   }
 }

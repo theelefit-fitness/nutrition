@@ -105,14 +105,21 @@ const Navbar = () => {
         </button>
        
         <ul className={`nav-menu ${menuOpen ? 'active' : ''}`}>
-          <li className="nav-item">
-            <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Home
-            </Link>
-          </li>
+          {!currentUser && (
+            <li className="nav-item">
+              <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>
+                Home
+              </Link>
+            </li>
+          )}
           <li className="nav-item">
             <Link to="/experts" className="nav-link" onClick={() => setMenuOpen(false)}>
               Find Experts
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/apply-as-expert" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Apply as Expert
             </Link>
           </li>
           

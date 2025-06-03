@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth';
 import RatingStars from '../components/RatingStars';
 import bookingService from '../services/bookingService';
 import googleCalendarService from '../services/googleCalendarService';
+import LoadingSpinner from '../components/LoadingSpinner';
 import './ExpertDashboard.css';
 
 // Default profile image that will be used for all experts
@@ -417,7 +418,7 @@ const ExpertDashboard = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading your expert dashboard...</div>;
+    return <LoadingSpinner text="Loading..." />;
   }
 
   return (

@@ -1,13 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import BookingSlot from '../components/BookingSlot';
-import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
 import expertsService from '../services/expertsService';
 import bookingService from '../services/bookingService';
 import { auth } from '../services/firebase';
 import './ExpertDetailPage.css';
 
+// RatingStars component
+const RatingStars = ({ initialRating = 0, onRatingChange, readOnly = false }) => {
+  const [rating, setRating] = useState(initialRating);
+  const [hover, setHover] = useState(0);
+
+  useEffect(() => {
+    setRating(initialRating);
+  }, [initialRating]);
+
+  const handleClick = (value) => {
+    if (readOnly) return;
+    
+    setRating(value);
+    if (onRatingChange) {
+      onRatingChange(value);
+    }
+  };
+
+  return (
+    <div className={`rating-stars ${readOnly ? 'readonly' : 'interactive'}`}>
+      {[...Array(5)].map((_, index) => {
+        const starValue = index + 1;
+        return (
+          <span
+            key={index}
+            className={`star ${(hover || rating) >= starValue ? 'filled' : ''} ${readOnly ? 'readonly' : ''}`}
+            onClick={() => handleClick(starValue)}
+            onMouseEnter={() => !readOnly && setHover(starValue)}
+            onMouseLeave={() => !readOnly && setHover(0)}
+            title={readOnly ? `${rating} out of 5` : `Rate ${starValue} out of 5`}
+          >
+            ★
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+// BookingSlot component
+const BookingSlot = ({ slot, expertId, onBook, currentUser, onLoginRedirect }) => {
+  const handleBookClick = () => {
+    if (!currentUser) {
+      onLoginRedirect();
+      return;
+    }
+    onBook(expertId, slot.id);
+  };
+
+  return (
+    <div className="booking-slot">
+      <div className="slot-time">{slot.time}</div>
+      <button 
+        className="book-button"
+        onClick={handleBookClick}
+      >
+        Book Now
+      </button>
+    </div>
+  );
+};
+
+// Main ExpertDetailPage component
 const ExpertDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,7 +99,6 @@ const ExpertDetailPage = () => {
         }
         setExpert(data);
         
-        // If user is logged in, check if they've already rated this expert
         if (currentUser && data.ratings) {
           const userPreviousRating = data.ratings.find(r => r.userId === currentUser.uid);
           if (userPreviousRating) {
@@ -67,21 +127,18 @@ const ExpertDetailPage = () => {
     }
 
     try {
-      // Create user data object for booking
       const userData = {
         userId: currentUser.uid,
         userName: currentUser.displayName || currentUser.email.split('@')[0],
         userEmail: currentUser.email,
-        notes: ''  // You could add a notes field in the future
+        notes: ''
       };
 
-      // Request the booking
       const response = await bookingService.requestBooking(expertId, slotId, userData);
       
       setExpert(response.expert);
       setMessage({ text: response.message, type: 'success' });
       
-      // Store the recent booking data for display
       const bookedSlot = expert.availableSlots.find(slot => slot.id === parseInt(slotId));
       setRecentBooking({
         expertName: expert.name,
@@ -90,7 +147,6 @@ const ExpertDetailPage = () => {
         status: 'pending'
       });
       
-      // Navigate to user dashboard to show the booking immediately
       setTimeout(() => {
         navigate('/user-dashboard', { 
           state: { refreshBookings: true }
@@ -99,7 +155,6 @@ const ExpertDetailPage = () => {
     } catch (error) {
       setMessage({ text: error.message || 'Booking failed', type: 'error' });
       
-      // Clear error message after 3 seconds
       setTimeout(() => {
         setMessage({ text: '', type: '' });
       }, 3000);
@@ -122,14 +177,12 @@ const ExpertDetailPage = () => {
       setUserRating(ratingValue);
       setMessage({ text: response.message, type: 'success' });
       
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setMessage({ text: '', type: '' });
       }, 3000);
     } catch (error) {
       setMessage({ text: error.message || 'Rating failed', type: 'error' });
       
-      // Clear error message after 3 seconds
       setTimeout(() => {
         setMessage({ text: '', type: '' });
       }, 3000);
@@ -200,7 +253,9 @@ const ExpertDetailPage = () => {
           </div>
           <div className="expert-info">
             <h1>{expert.name}</h1>
-            <p className="specialty">{expert.specialty}</p>
+            <div className="specialty-badge">
+              <p className="specialty">{expert.specialty}</p>
+            </div>
             <p className="experience">{expert.experience} Experience</p>
             <div className="qualifications">
               <h3>Qualifications</h3>
@@ -208,7 +263,8 @@ const ExpertDetailPage = () => {
             </div>
             <div className="rating-section">
               <div className="current-rating">
-                <span>Rating: {expert.rating || 'No ratings yet'}</span>
+                <span className="rating-label">Rating:</span>
+                <span className="rating-value">{expert.rating || 'No ratings yet'}</span>
                 <RatingStars initialRating={Math.round(expert.rating || 0)} readOnly={true} />
                 <span className="rating-count">({expert.ratings ? expert.ratings.length : 0} ratings)</span>
               </div>

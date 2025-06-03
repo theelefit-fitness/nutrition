@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import expertsService from '../services/expertsService';
 import './CommentSection.css';
+import { formatDistanceToNow } from 'date-fns';
 
 // Default avatar for users without profile pictures
 const DEFAULT_AVATAR = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg";
@@ -9,6 +10,9 @@ const DEFAULT_AVATAR = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_Ldbm
 const CommentSection = ({ expertId, currentUser }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [isPosting, setIsPosting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -33,50 +37,139 @@ const CommentSection = ({ expertId, currentUser }) => {
     }
   };
 
-  const handleCommentChange = (e) => {
-    setNewComment(e.target.value);
+  const getAvatarColor = (username) => {
+    if (!username) return '#0ca789'; // Default color if no username
+    
+    const colors = [
+      '#4E3580', '#C8DA2B', '#0ca789', '#1976d2', '#f44336', 
+      '#ff9800', '#9c27b0', '#3f51b5', '#009688', '#cddc39'
+    ];
+    const hash = username.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
   };
 
-  const handleSubmitComment = async (e) => {
-    e.preventDefault();
-    
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name
+      .toString()
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getUserDisplayName = (user) => {
+    if (!user) return 'Anonymous';
+    return user.displayName || (user.email ? user.email.split('@')[0] : 'Anonymous');
+  };
+
+  const handlePostComment = () => {
+    if (!newComment.trim()) return;
     if (!currentUser) {
       setShowLoginPrompt(true);
-      setMessage({ text: 'Please log in to comment', type: 'error' });
+      setMessage({ text: 'Please log in to post comments', type: 'error' });
       setTimeout(() => {
         setMessage({ text: '', type: '' });
       }, 3000);
       return;
     }
 
-    if (!newComment.trim()) {
-      setMessage({ text: 'Comment cannot be empty', type: 'error' });
-      setTimeout(() => {
-        setMessage({ text: '', type: '' });
-      }, 3000);
-      return;
-    }
+    setIsPosting(true);
+    const userName = getUserDisplayName(currentUser);
+    const newCommentObj = {
+      id: Date.now(),
+      userName: userName,
+      text: newComment,
+      timestamp: new Date(),
+      likes: 0,
+      liked: false,
+      replies: []
+    };
 
-    try {
-      const response = await expertsService.addComment(
-        expertId,
-        currentUser.uid,
-        currentUser.email.split('@')[0], // Use email username as display name
-        newComment.trim()
-      );
-      
-      setComments(response.expert.comments);
+    // Animate new comment
+    setTimeout(() => {
+      setComments(prev => [newCommentObj, ...prev]);
       setNewComment('');
+      setIsPosting(false);
       setMessage({ text: 'Comment added successfully', type: 'success' });
       setTimeout(() => {
         setMessage({ text: '', type: '' });
       }, 3000);
-    } catch (error) {
-      setMessage({ text: error.message || 'Failed to add comment', type: 'error' });
+    }, 300);
+  };
+
+  const handlePostReply = (commentId) => {
+    if (!replyText.trim()) return;
+    if (!currentUser) {
+      setShowLoginPrompt(true);
+      setMessage({ text: 'Please log in to reply', type: 'error' });
       setTimeout(() => {
         setMessage({ text: '', type: '' });
       }, 3000);
+      return;
     }
+
+    const newReply = {
+      id: Date.now(),
+      author: currentUser.displayName || currentUser.email.split('@')[0],
+      text: replyText,
+      date: new Date(),
+      likes: 0,
+      liked: false
+    };
+
+    setComments(prev => prev.map(comment => {
+      if (comment.id === commentId) {
+        return {
+          ...comment,
+          replies: [...(comment.replies || []), newReply]
+        };
+      }
+      return comment;
+    }));
+
+    setReplyingTo(null);
+    setReplyText('');
+  };
+
+  const toggleLike = (commentId, isReply = false, parentId = null) => {
+    if (!currentUser) {
+      setShowLoginPrompt(true);
+      setMessage({ text: 'Please log in to like comments', type: 'error' });
+      setTimeout(() => {
+        setMessage({ text: '', type: '' });
+      }, 3000);
+      return;
+    }
+
+    setComments(prev => prev.map(comment => {
+      if (isReply && parentId === comment.id) {
+        return {
+          ...comment,
+          replies: comment.replies.map(reply => {
+            if (reply.id === commentId) {
+              const currentLikes = parseInt(reply.likes) || 0;
+              return {
+                ...reply,
+                likes: reply.liked ? currentLikes - 1 : currentLikes + 1,
+                liked: !reply.liked
+              };
+            }
+            return reply;
+          })
+        };
+      }
+      if (!isReply && comment.id === commentId) {
+        const currentLikes = parseInt(comment.likes) || 0;
+        return {
+          ...comment,
+          likes: comment.liked ? currentLikes - 1 : currentLikes + 1,
+          liked: !comment.liked
+        };
+      }
+      return comment;
+    }));
   };
 
   const handleLoginRedirect = () => {
@@ -84,23 +177,26 @@ const CommentSection = ({ expertId, currentUser }) => {
   };
 
   const formatDate = (timestamp) => {
-    const date = timestamp instanceof Date ? timestamp : timestamp.toDate();
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // Generate random avatar color based on username
-  const getAvatarColor = (username) => {
-    const colors = [
-      '#4E3580', '#C8DA2B', '#0ca789', '#1976d2', '#f44336', 
-      '#ff9800', '#9c27b0', '#3f51b5', '#009688', '#cddc39'
-    ];
-    const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
-
-  // Get user initials for avatar
-  const getInitials = (username) => {
-    return username.substring(0, 2).toUpperCase();
+    if (!timestamp) return 'Invalid date';
+    
+    try {
+      // Handle Firestore Timestamp
+      if (timestamp && typeof timestamp.toDate === 'function') {
+        return formatDistanceToNow(timestamp.toDate(), { addSuffix: true });
+      }
+      // Handle JavaScript Date object
+      if (timestamp instanceof Date) {
+        return formatDistanceToNow(timestamp, { addSuffix: true });
+      }
+      // Handle numeric timestamp
+      if (typeof timestamp === 'number') {
+        return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+      }
+      return 'Invalid date';
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
   };
 
   return (
@@ -113,25 +209,31 @@ const CommentSection = ({ expertId, currentUser }) => {
         </div>
       )}
       
-      <form className="comment-form" onSubmit={handleSubmitComment}>
+      <div className="comment-form">
         {currentUser && (
           <div className="current-user">
-            <div className="user-avatar" style={{ backgroundColor: getAvatarColor(currentUser.email.split('@')[0]) }}>
-              {getInitials(currentUser.email.split('@')[0])}
+            <div className="user-avatar" style={{ backgroundColor: getAvatarColor(getUserDisplayName(currentUser)) }}>
+              {getInitials(getUserDisplayName(currentUser))}
             </div>
-            <span>{currentUser.email.split('@')[0]}</span>
+            <span>{getUserDisplayName(currentUser)}</span>
           </div>
         )}
         <textarea
-          placeholder="Write a comment..."
-          value={newComment}
-          onChange={handleCommentChange}
           className="comment-input"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Write your comment..."
+          disabled={!currentUser}
         />
-        <button type="submit" className="comment-button">
-          Post Comment
+        <button 
+          className="post-comment-btn"
+          onClick={handlePostComment}
+          disabled={!currentUser || !newComment.trim() || isPosting}
+        >
+          <i className="fas fa-paper-plane"></i>
+          {isPosting ? 'Posting...' : 'Post Comment'}
         </button>
-      </form>
+      </div>
       
       {!currentUser && showLoginPrompt && (
         <div className="login-prompt-container">
@@ -153,8 +255,8 @@ const CommentSection = ({ expertId, currentUser }) => {
         <div className="comments-list">
           {comments.length > 0 ? (
             comments.sort((a, b) => {
-              const dateA = a.timestamp instanceof Date ? a.timestamp : a.timestamp.toDate();
-              const dateB = b.timestamp instanceof Date ? b.timestamp : b.timestamp.toDate();
+              const dateA = a.timestamp ? (typeof a.timestamp.toDate === 'function' ? a.timestamp.toDate() : new Date(a.timestamp)) : new Date();
+              const dateB = b.timestamp ? (typeof b.timestamp.toDate === 'function' ? b.timestamp.toDate() : new Date(b.timestamp)) : new Date();
               return dateB - dateA;
             }).map(comment => (
               <div key={comment.id} className="comment-item">
@@ -167,6 +269,74 @@ const CommentSection = ({ expertId, currentUser }) => {
                     <span className="comment-date">{formatDate(comment.timestamp)}</span>
                   </div>
                   <p className="comment-text">{comment.text}</p>
+                  <div className="comment-actions">
+                    <button 
+                      className={`comment-action ${comment.liked ? 'liked' : ''}`}
+                      onClick={() => toggleLike(comment.id)}
+                    >
+                      <i className={`${comment.liked ? 'fas' : 'far'} fa-heart`}></i>
+                      {comment.likes}
+                    </button>
+                    <button 
+                      className="comment-action"
+                      onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                    >
+                      <i className="far fa-comment"></i>
+                      Reply
+                    </button>
+                  </div>
+
+                  {/* Reply Form */}
+                  {replyingTo === comment.id && (
+                    <div className="reply-form">
+                      <textarea
+                        className="reply-input"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Write your reply..."
+                        disabled={!currentUser}
+                      />
+                      <button 
+                        className="post-comment-btn"
+                        onClick={() => handlePostReply(comment.id)}
+                        disabled={!currentUser || !replyText.trim()}
+                      >
+                        <i className="fas fa-reply"></i>
+                        Post Reply
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Replies */}
+                  {comment.replies && comment.replies.length > 0 && (
+                    <div className="replies-container">
+                      {comment.replies.map(reply => (
+                        <div key={reply.id} className="comment-item">
+                          <div className="comment-avatar">
+                            {getInitials(reply.author)}
+                          </div>
+                          <div className="comment-content">
+                            <div className="comment-header">
+                              <span className="comment-author">{reply.author}</span>
+                              <span className="comment-date">
+                                {formatDate(reply.date)}
+                              </span>
+                            </div>
+                            <p className="comment-text">{reply.text}</p>
+                            <div className="comment-actions">
+                              <button 
+                                className={`comment-action ${reply.liked ? 'liked' : ''}`}
+                                onClick={() => toggleLike(reply.id, true, comment.id)}
+                              >
+                                <i className={`${reply.liked ? 'fas' : 'far'} fa-heart`}></i>
+                                {reply.likes}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))

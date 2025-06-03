@@ -2,6 +2,7 @@
   max-width: 1000px;
   margin: 40px auto;
   padding: 0 20px;
+;
 }
 
 .loading-container {
@@ -62,6 +63,8 @@
   display: flex;
   padding: 30px;
   background-color: #f9f9f9;
+  align-items: flex-start;
+  border-bottom: 1px solid #eee;
 }
 
 .expert-image {
@@ -82,66 +85,117 @@
 
 .expert-info {
   flex: 1;
+  text-align: left;
 }
 
 .expert-info h1 {
-  margin: 0 0 10px 0;
+  margin: 0 0 15px 0;
   color: #333;
+  text-align: left;
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+.specialty-badge {
+  display: inline-block;
+  margin: 0 0 10px 0;
 }
 
 .specialty {
+  display: inline-block;
+  background-color: #f0f0f9;
   color: #0ca789;
   font-weight: bold;
-  font-size: 1.2rem;
-  margin: 5px 0;
+  font-size: 1rem;
+  margin: 0;
+  padding: 6px 15px;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .experience {
   color: #555;
-  margin: 5px 0 15px;
+  margin: 10px 0 15px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.experience::before {
+  content: "•";
+  margin-right: 8px;
+  color: #0ca789;
+  font-size: 1.2rem;
 }
 
 .qualifications {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  text-align: left;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #0ca789;
 }
 
 .qualifications h3 {
-  margin: 0 0 5px 0;
+  margin: 0 0 10px 0;
   color: #333;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  text-align: left;
 }
 
 .qualifications p {
   margin: 0;
   color: #555;
+  line-height: 1.5;
 }
 
 .rating-section {
-  margin-top: 15px;
+  margin-top: 20px;
+  text-align: left;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
 }
 
 .current-rating {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 15px;
+  flex-wrap: wrap;
+  background-color: rgba(12, 167, 137, 0.05);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.rating-label {
+  font-weight: 500;
+}
+
+.rating-value {
+  font-weight: 600;
+  margin-right: 5px;
 }
 
 .rating-count {
   color: #666;
   font-size: 0.9rem;
+  margin-left: 5px;
+  opacity: 0.8;
 }
 
 .user-rating {
-  padding: 15px;
+  padding: 20px;
   background-color: #f0f0f0;
   border-radius: 8px;
+  margin-top: 15px;
+  border-left: 3px solid #ffc107;
 }
 
 .user-rating h4 {
-  margin: 0 0 10px 0;
+  margin: 0 0 15px 0;
   color: #333;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .login-prompt-container {
@@ -185,19 +239,23 @@
 }
 
 .expert-bio {
-  padding: 30px;
+  padding: 35px 30px;
   border-bottom: 1px solid #eee;
+  text-align: left;
 }
 
 .expert-bio h3 {
-  margin: 0 0 15px 0;
+  margin: 0 0 20px 0;
   color: #333;
+  text-align: left;
+  font-size: 1.5rem;
 }
 
 .expert-bio p {
   margin: 0;
   line-height: 1.6;
   color: #555;
+  text-align: left;
 }
 
 .booking-section {
@@ -225,7 +283,7 @@
   .expert-profile-header {
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    padding: 20px;
   }
   
   .expert-image {
@@ -235,14 +293,63 @@
     height: 150px;
   }
   
-  .current-rating, .user-rating {
+  .expert-info, .expert-info h1, .qualifications h3 {
+    text-align: center;
+  }
+  
+  .qualifications, .expert-bio {
+    text-align: left;
+    padding: 15px;
+  }
+  
+  .specialty-badge {
+    display: flex;
     justify-content: center;
+    width: 100%;
+  }
+  
+  .experience {
+    justify-content: center;
+  }
+  
+  .current-rating {
+    justify-content: center;
+    margin: 10px 0;
   }
   
   .slots-container {
     grid-template-columns: 1fr;
   }
-} 
+}
+
+@media (max-width: 480px) {
+  .expert-detail-container {
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+  
+  .expert-profile-header {
+    padding: 15px;
+  }
+  
+  .expert-image {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .expert-info h1 {
+    font-size: 1.5rem;
+  }
+  
+  .specialty {
+    font-size: 0.9rem;
+    padding: 5px 12px;
+  }
+  
+  .qualifications, .expert-bio, .booking-section {
+    padding: 15px;
+  }
+}
 
 .booking-success {
   position: fixed;
@@ -322,4 +429,347 @@
 .view-dashboard-button:hover {
   background-color: #372659;
   transform: translateY(-2px);
-} 
+}
+
+/* Add styling for rate this expert section */
+.rating-stars {
+  margin: 10px 0;
+}
+
+/* Add a border around the rating section to make it stand out */
+.user-rating .rating-stars {
+  padding: 5px 0;
+}
+
+/* Rating Stars Styles */
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+}
+
+.rating-stars.interactive {
+  cursor: pointer;
+}
+
+.rating-stars.interactive:hover {
+  transform: scale(1.05);
+}
+
+.star {
+  color: #ddd;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+  margin-right: 3px;
+  position: relative;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.star.filled {
+  color: #ffc107;
+  text-shadow: 0 0 2px rgba(255, 193, 7, 0.5);
+}
+
+.star.readonly {
+  cursor: default;
+}
+
+.star:hover:not(.readonly) {
+  transform: scale(1.3);
+  color: #ffc107;
+}
+
+@keyframes starPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.star.filled:not(.readonly) {
+  animation: starPulse 0.5s ease;
+}
+
+/* Booking Slot Styles */
+.booking-slot {
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.booking-slot:hover {
+  border-color: #0ca789;
+  box-shadow: 0 4px 8px rgba(12, 167, 137, 0.1);
+  transform: translateY(-2px);
+}
+
+.slot-time {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.book-button {
+  background-color: #0ca789;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.book-button:hover {
+  background-color: #098f74;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .booking-slot {
+    padding: 12px;
+  }
+
+  .slot-time {
+    font-size: 0.95rem;
+  }
+
+  .book-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Comment Section Styles */
+.comments-section {
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.comments-section h3 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.comment-form {
+  margin-bottom: 30px;
+}
+
+.comment-input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: #0ca789;
+  box-shadow: 0 0 0 2px rgba(12, 167, 137, 0.1);
+}
+
+.post-comment-btn {
+  background-color: #0ca789;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.post-comment-btn:hover {
+  background-color: #098f74;
+  transform: translateY(-2px);
+}
+
+.post-comment-btn:active {
+  transform: translateY(0);
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comment-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  animation: slideIn 0.3s ease-out forwards;
+  border-left: 3px solid #0ca789;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.comment-content {
+  flex: 1;
+  text-align: left;
+  width: 100%;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+}
+
+.comment-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.comment-text {
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 15px;
+  font-size: 0.9rem;
+}
+
+.comment-action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.comment-action:hover {
+  color: #0ca789;
+  background-color: rgba(12, 167, 137, 0.1);
+}
+
+.comment-action.liked {
+  color: #e53935;
+}
+
+.comment-action i {
+  font-size: 1.1rem;
+}
+
+.replies-container {
+  margin-left: 55px;
+  margin-top: 15px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 15px;
+}
+
+.reply-form {
+  margin-top: 10px;
+  margin-left: 55px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.reply-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 60px;
+  margin-bottom: 10px;
+}
+
+.reply-input:focus {
+  outline: none;
+  border-color: #0ca789;
+  box-shadow: 0 0 0 2px rgba(12, 167, 137, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.like-animation {
+  animation: likeEffect 0.4s ease-out;
+}
+
+@keyframes likeEffect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Add Font Awesome icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'); 
