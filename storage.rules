@@ -1,12 +1,28 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+    // Default rule - deny all
     match /{allPaths=**} {
       allow read, write: if false;
     }
+    
+    // Allow users to read and write their own files
+    match /{userEmail}/media/{fileName} {
+      // Allow public read access to profile images
+      allow read: if true;
+                    
+      // Allow write if the file belongs to the authenticated user
+      allow write, delete: if request.auth != null && 
+                    request.auth.token.email == userEmail &&
+                    (
+                      // For write operations, check file size and type
+                      (request.resource != null && 
+                       request.resource.size < 5 * 1024 * 1024 && // 5MB max
+                       request.resource.contentType.matches('image/.*')) ||
+                      // For delete operations, no need to check file properties
+                      request.resource == null
+                    );
+    }
   }
-}
+} 

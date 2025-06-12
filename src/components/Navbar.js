@@ -112,7 +112,12 @@ const Navbar = () => {
           </li>
           <li className="nav-item">
             <Link to="/experts" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Find Experts
+              Find Expert
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/apply-as-expert" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Apply as Expert
             </Link>
           </li>
           
@@ -122,7 +127,7 @@ const Navbar = () => {
                 <>
                   <li className="nav-item">
                     {userType === 'expert' ? (
-                      <Link to="/expert-dashboard" className="nav-link " onClick={() => setMenuOpen(false)}>
+                      <Link to="/expert-dashboard" className="nav-link" onClick={() => setMenuOpen(false)}>
                         Dashboard
                       </Link>
                     ) : (
@@ -131,20 +136,18 @@ const Navbar = () => {
                       </Link>
                     )}
                   </li>
-                  <li className="nav-item ">
-                    <button onClick={() => {handleLogout(); setMenuOpen(false);}} className="nav-button nav-link-button">
+                  <li className="nav-item">
+                    <button onClick={handleLogout} className="nav-button">
                       Logout
                     </button>
                   </li>
                 </>
               ) : (
-                <>
-                  <li className="nav-item">
-                    <Link to="/auth" className="nav-link-button" onClick={() => setMenuOpen(false)}>
-                      Login / Register
-                    </Link>
-                  </li>
-                </>
+                <li className="nav-item">
+                  <Link to="/auth" className="nav-link-button" onClick={() => setMenuOpen(false)}>
+                    Login / Register
+                  </Link>
+                </li>
               )}
             </>
           )}

@@ -1,10 +1,11 @@
+
 .navbar {
   background-color: transparent;
   height: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed;
+  position: fixed;  
   top: 0;
   left: 0;
   right: 0;
@@ -87,6 +88,7 @@
 .nav-item {
   margin: 0 15px;
   opacity: 0;
+ 
   transform: translateY(10px);
   animation: fadeInDown 0.5s forwards;
 }
@@ -139,7 +141,8 @@
 .nav-button {
   background-color: transparent;
   border: 1px solid white;
-  color: white;
+  color:  #4D4D4D;;
+  background-color:#C8DA2B;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -158,8 +161,9 @@
 }
 
 .nav-button:hover {
-  color: #C8DA2B;
+color: black;
   border-color: #C8DA2B;
+  
 }
 
 .scrolled .nav-button:hover {
